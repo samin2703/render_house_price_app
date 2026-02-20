@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boston House Price Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(circle at top left, #1a202c, #111827); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 text-gray-100">
+    <div class="max-w-md w-full bg-gray-800 rounded-2xl shadow-2xl p-8 border border-gray-700">
+        <h1 class="text-3xl font-bold mb-2 text-blue-400 text-center">Boston Housing AI</h1>
+        <p class="text-gray-400 text-sm text-center mb-8">Enter house features to predict market value.</p>
+        
+        <form id="predict-form" class="space-y-4">
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Rooms (RM)</label>
+            <input type="number" step="0.1" name="RM" placeholder="e.g. 6.5" required class="w-full bg-gray-900 border border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Lower Status % (LSTAT)</label>
+            <input type="number" step="0.1" name="LSTAT" placeholder="e.g. 12.5" required class="w-full bg-gray-900 border border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Distance (DIS)</label>
+            <input type="number" step="0.1" name="DIS" placeholder="e.g. 3.8" required class="w-full bg-gray-900 border border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Tax Rate (TAX)</label>
+            <input type="number" step="1" name="TAX" placeholder="e.g. 300" required class="w-full bg-gray-900 border border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Pollution (NOX)</label>
+            <input type="number" step="0.01" name="NOX" placeholder="e.g. 0.53" required class="w-full bg-gray-900 border border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Pupil-Teacher (PTRATIO)</label>
+            <input type="number" step="0.1" name="PTRATIO" placeholder="e.g. 18.5" required class="w-full bg-gray-900 border border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+        </div>
+    </div>
+    
+    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition duration-300 shadow-lg transform hover:-translate-y-1">
+        Predict Price
+    </button>
+</form>
+
+        <div id="result" class="mt-8 hidden border-t border-gray-700 pt-6 text-center">
+            <p class="text-gray-400 text-sm italic">Estimated Value:</p>
+            <h2 id="price" class="text-4xl font-extrabold text-green-400 mt-1"></h2>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('predict-form');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('price').innerText = `$${(result.predicted_price * 1000).toLocaleString()}`;
+        };
+    </script>
+</body>
+</html>
